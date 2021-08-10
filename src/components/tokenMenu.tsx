@@ -14,20 +14,26 @@ const TokenMenu: FC<tokenParams | undefined> = ({
   tokenList,
   loading,
 }): ReactElement => {
-  const [activeItem, setActiveItem] = useState(tokenList[0]["tokenName"]);
+  const [activeItem, setActiveItem] = useState("DAI");
   const handleClick = (e: any, data: any) => {
     setActiveItem(data.name);
   };
-  console.log(tokenList);
+  const noDuplicatesList = _.orderBy(
+    _.uniqBy(tokenList, "tokenName"),
+    "tokenName"
+  );
+  console.log(noDuplicatesList);
+
   return (
     <div className="container">
       <Menu secondary>
-        {_.map(tokenList, (token) => {
+        {_.map(noDuplicatesList, (token) => {
           return (
             <Menu.Item
               name={token.tokenName}
               active={activeItem === token.tokenName}
               onClick={handleClick}
+              key={token.tokenAddress}
             />
           );
         })}

@@ -26,7 +26,6 @@ const Home: FC<any> = (): ReactElement => {
         tokenAddress: token.token_address,
       });
     }
-    console.log(tokens);
   }
 
   return (
