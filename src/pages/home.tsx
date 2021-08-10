@@ -3,6 +3,8 @@ import { gql } from "@apollo/client/core";
 import { useQuery } from "@apollo/client";
 import TokenMenu from "../components/tokenMenu";
 import * as _ from "lodash";
+import { Grid } from "semantic-ui-react";
+import ProtocolMenu from "../components/protocolMenu";
 
 const query = gql`
   query getAllTokens {
@@ -30,7 +32,22 @@ const Home: FC<any> = (): ReactElement => {
 
   return (
     <div className="container">
-      <TokenMenu tokenList={tokens} loading={loading} />
+      <Grid columns={2}>
+        <Grid.Row>
+          <Grid.Column className="box" style={{ margin: 2 }}>
+            <h3 className="title is-4 has-text-primary-dark">
+              Leveraged token:
+            </h3>
+            <TokenMenu />
+          </Grid.Column>
+          <Grid.Column className="box" style={{ margin: 2 }}>
+            <h3 className="title is-4 has-text-primary-dark">
+              Protocols to include:
+            </h3>
+            <ProtocolMenu />
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     </div>
   );
 };

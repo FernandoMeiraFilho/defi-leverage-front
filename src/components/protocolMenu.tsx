@@ -4,15 +4,14 @@ import _ from "lodash";
 import { gql, useQuery } from "@apollo/client";
 
 const query = gql`
-  query getAllTokens {
-    tokens {
-      token_ERC_code
-      token_address
+  query getAllProtocols {
+    protocols {
+      name
     }
   }
 `;
 
-const TokenMenu: FC = (): ReactElement => {
+const ProtocolMenu: FC = (): ReactElement => {
   const [activeItem, setActiveItem] = useState("DAI");
   const handleClick = (e: any, data: any) => {
     setActiveItem(data.name);
@@ -22,32 +21,26 @@ const TokenMenu: FC = (): ReactElement => {
     variables: { language: "english" },
   });
 
-  let tokens = [];
+  let protocols = [];
   if (!loading) {
-    for (let token of data.tokens) {
-      tokens.push({
-        tokenName: token.token_ERC_code,
-        tokenAddress: token.token_address,
+    for (let protocol of data.protocols) {
+      protocols.push({
+        name: protocol.name,
       });
     }
   }
 
-  const noDuplicatesList = _.orderBy(
-    _.uniqBy(tokens, "tokenName"),
-    "tokenName"
-  );
-
   return (
     <div className="container ">
       <Menu className="container is-flex-wrap-wrap" secondary>
-        {_.map(noDuplicatesList, (token) => {
+        {_.map(protocols, (protocol) => {
           return (
             <Menu.Item
               className=""
-              name={token.tokenName}
-              active={activeItem === token.tokenName}
+              name={protocol.name}
+              active={activeItem === protocol.name}
               onClick={handleClick}
-              key={token.tokenAddress}
+              key={protocol.name}
             />
           );
         })}
@@ -56,4 +49,4 @@ const TokenMenu: FC = (): ReactElement => {
   );
 };
 
-export default TokenMenu;
+export default ProtocolMenu;
