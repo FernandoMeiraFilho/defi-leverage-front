@@ -34,13 +34,13 @@ const Home: FC<any> = (): ReactElement => {
     <div className="container">
       <Grid columns={2}>
         <Grid.Row>
-          <Grid.Column className="box" style={{ margin: 2 }}>
+          <Grid.Column className="box" style={{ margin: 2 }} width={10}>
             <h3 className="title is-4 has-text-primary-dark">
               Leveraged token:
             </h3>
             <TokenMenu />
           </Grid.Column>
-          <Grid.Column className="box" style={{ margin: 2 }}>
+          <Grid.Column className="box" style={{ margin: 2 }} width={2}>
             <h3 className="title is-4 has-text-primary-dark">
               Protocols to include:
             </h3>
