@@ -2,8 +2,9 @@ import React, { FC, ReactElement, useState } from "react";
 import { gql } from "@apollo/client/core";
 import TokenMenu from "../components/tokenMenu";
 import * as _ from "lodash";
-import { Grid } from "semantic-ui-react";
+import { Grid, GridRow } from "semantic-ui-react";
 import ProtocolMenu from "../components/protocolMenu";
+import LeverageDistributionGraph from "../components/leverageDistributionGraph";
 
 const Home: FC<any> = (): ReactElement => {
   const [selectedToken, setSelectedToken] = useState("DAI");
@@ -27,6 +28,12 @@ const Home: FC<any> = (): ReactElement => {
             </h3>
             <ProtocolMenu setSelectedProtocol={setSelectedProtocol} />
           </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <LeverageDistributionGraph
+            selectedToken={selectedToken}
+            selectedProtocol={selectedProtocol}
+          />
         </Grid.Row>
       </Grid>
     </div>
