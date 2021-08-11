@@ -11,17 +11,18 @@ const query = gql`
   }
 `;
 
-const ProtocolMenu: FC = (): ReactElement => {
-  const [activeItem, setActiveItem] = useState("DAI");
+const ProtocolMenu: FC<any> = ({ setSelectedProtocol }): ReactElement => {
+  const [activeItem, setActiveItem] = useState("ALL");
   const handleClick = (e: any, data: any) => {
     setActiveItem(data.name);
+    setSelectedProtocol(data.name);
   };
 
   const { loading, error, data } = useQuery(query, {
     variables: { language: "english" },
   });
 
-  let protocols = [];
+  let protocols = [{ name: "ALL" }];
   if (!loading) {
     for (let protocol of data.protocols) {
       protocols.push({

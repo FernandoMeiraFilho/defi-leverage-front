@@ -12,10 +12,11 @@ const query = gql`
   }
 `;
 
-const TokenMenu: FC = (): ReactElement => {
+const TokenMenu: FC<any> = ({ setSelectedToken }): ReactElement => {
   const [activeItem, setActiveItem] = useState("DAI");
   const handleClick = (e: any, data: any) => {
     setActiveItem(data.name);
+    setSelectedToken(data.name);
   };
 
   const { loading, error, data } = useQuery(query, {
