@@ -10,8 +10,6 @@ const Home: FC<any> = (): ReactElement => {
   const [selectedToken, setSelectedToken] = useState("DAI");
   const [selectedProtocol, setSelectedProtocol] = useState("ALL");
 
-  console.log(selectedToken, selectedProtocol);
-
   return (
     <div className="container">
       <Grid columns={2}>

@@ -1,7 +1,16 @@
 import React, { FC, ReactElement } from "react";
-import { Menu } from "semantic-ui-react";
 import _ from "lodash";
 import { gql, useQuery } from "@apollo/client";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 type GraphProps = {
   selectedToken: string;
@@ -25,13 +34,37 @@ const LeverageDistributionGraph: FC<GraphProps> = ({
     variables: { language: "english" },
   });
 
+  const graphData = [];
   if (!loading) {
-    console.log(data.collateral);
+    for (let collateral of data.collateral) {
+      graphData.push(collateral);
+    }
   }
+  console.log(graphData);
 
   return (
-    <div className="container ">
+    <div className="box">
       <h1>Teste</h1>
+      <ResponsiveContainer width={1024} height="90%">
+        <BarChart
+          width={900}
+          height={350}
+          data={graphData}
+          margin={{
+            top: 5,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="liquidationPrice" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="collateralAmount" fill="#8884d8" />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 };
