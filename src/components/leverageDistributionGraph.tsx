@@ -4,6 +4,7 @@ import { gql, useQuery } from "@apollo/client";
 import {
   Bar,
   BarChart,
+  Brush,
   CartesianGrid,
   Legend,
   ResponsiveContainer,
@@ -34,21 +35,30 @@ const LeverageDistributionGraph: FC<GraphProps> = ({
     variables: { language: "english" },
   });
 
-  const graphData = [];
+  let graphData = [];
+  let maxPrice = 0;
   if (!loading) {
     for (let collateral of data.collateral) {
-      graphData.push(collateral);
+      graphData.push({
+        ...collateral,
+        liquidationPrice: Math.floor(collateral.liquidationPrice * 100) / 100,
+        collateralAmount: Math.floor(collateral.collateralAmount * 100) / 100,
+      });
+      maxPrice =
+        collateral.liquidationPRice > maxPrice
+          ? collateral.liquidationPRice
+          : 0;
     }
+
+    graphData = _.orderBy(graphData, ["liquidationPrice"], ["asc"]);
   }
   console.log(graphData);
 
   return (
     <div className="box">
       <h1>Teste</h1>
-      <ResponsiveContainer width={1024} height="90%">
+      <ResponsiveContainer width={1335} height="90%">
         <BarChart
-          width={900}
-          height={350}
           data={graphData}
           margin={{
             top: 5,
@@ -62,6 +72,7 @@ const LeverageDistributionGraph: FC<GraphProps> = ({
           <YAxis />
           <Tooltip />
           <Legend />
+          <Brush dataKey="liquidationPrice" height={30} stroke="#8884d8" />
           <Bar dataKey="collateralAmount" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>
