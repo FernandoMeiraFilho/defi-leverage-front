@@ -4,7 +4,6 @@ import { gql, useQuery } from "@apollo/client";
 import {
   Bar,
   BarChart,
-  Brush,
   CartesianGrid,
   Legend,
   ResponsiveContainer,
@@ -13,9 +12,15 @@ import {
   YAxis,
 } from "recharts";
 
+import tickerHandler from "../handlers/tickerUnitHandler";
+
 type GraphProps = {
   selectedToken: string;
   selectedProtocol: string;
+};
+
+const tickFormatter = (num: number) => {
+  return num.toLocaleString();
 };
 
 const LeverageDistributionGraph: FC<GraphProps> = ({
@@ -35,45 +40,83 @@ const LeverageDistributionGraph: FC<GraphProps> = ({
     variables: { language: "english" },
   });
 
+  let cleanData;
+  let yTickerHandle: string | undefined = "";
   let graphData = [];
   let maxPrice = 0;
+  let numberOfDifferentPrices = new Set();
   if (!loading) {
+    //initial raw data loading
     for (let collateral of data.collateral) {
-      graphData.push({
-        ...collateral,
-        liquidationPrice: Math.floor(collateral.liquidationPrice * 100) / 100,
-        collateralAmount: Math.floor(collateral.collateralAmount * 100) / 100,
-      });
-      maxPrice =
-        collateral.liquidationPRice > maxPrice
-          ? collateral.liquidationPRice
-          : 0;
+      if (collateral.collateralAmount > 0.0001) {
+        graphData.push({
+          ...collateral,
+          liquidationPrice:
+            Math.floor(collateral.liquidationPrice * 1000) / 100,
+          collateralAmount:
+            Math.floor(collateral.collateralAmount * 1000) / 100,
+        });
+        if (collateral.liquidationPrice > maxPrice) {
+          maxPrice = collateral.liquidationPrice;
+        }
+
+        numberOfDifferentPrices.add(
+          Math.floor(collateral.liquidationPrice * 100) / 100
+        );
+      }
     }
 
     graphData = _.orderBy(graphData, ["liquidationPrice"], ["asc"]);
+
+    //formating and organizing the final data to be rendered on the graph
+    const { adjustedData, yTickerFormat } = tickerHandler(graphData);
+    cleanData = adjustedData;
+    yTickerHandle = yTickerFormat;
   }
-  console.log(graphData);
+
+  const finalData =
+    typeof cleanData === "string" || cleanData !== undefined
+      ? cleanData
+      : graphData;
+
+  let finalYticker;
+  if (yTickerHandle === "") {
+    finalYticker = "units";
+  } else {
+    finalYticker = yTickerHandle === "k" ? "thousand" : "million";
+  }
 
   return (
     <div className="box">
       <h1>Teste</h1>
       <ResponsiveContainer width={1335} height="90%">
         <BarChart
-          data={graphData}
+          data={finalData}
           margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
+            top: 2,
+            right: 15,
+            left: 15,
+            bottom: 3,
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="liquidationPrice" />
-          <YAxis />
+          <XAxis
+            name="Liquidation Price"
+            dataKey="liquidationPrice"
+            tickFormatter={tickFormatter}
+          />
+          <YAxis
+            label={{
+              value: `Collateral Amount (in ${finalYticker} tokens)`,
+              angle: -90,
+              position: "left",
+            }}
+            unit={yTickerHandle}
+            tickFormatter={tickFormatter}
+          />
           <Tooltip />
           <Legend />
-          <Brush dataKey="liquidationPrice" height={30} stroke="#8884d8" />
-          <Bar dataKey="collateralAmount" fill="#8884d8" />
+          <Bar dataKey="adjCollateralAmount" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -13,7 +13,7 @@ const tickerUnitHandler = (data: dataProps[]) => {
 
   if (highestXTicker === undefined || highestYTicker === undefined) {
     return {
-      adjustedData: "unable to get the highest values for X AND/OR Y axis",
+      adjustedData: [],
       err1: "",
     };
   } else {
@@ -30,7 +30,7 @@ const tickerUnitHandler = (data: dataProps[]) => {
 
     //fixing the Y axis
     let adjustedData;
-    if (maxYTickerDigits >= 3 && maxYTickerDigits < 6) {
+    if (maxYTickerDigits - 1 >= 3 && maxYTickerDigits - 1 < 6) {
       adjustedData = _.map(data, (obj) => {
         yTickerFormat = "k";
         return {
@@ -39,13 +39,13 @@ const tickerUnitHandler = (data: dataProps[]) => {
             Math.floor((obj.collateralAmount / 10 ** 3) * 100) / 100,
         };
       });
-    } else if (maxYTickerDigits >= 6) {
+    } else if (maxYTickerDigits - 1 >= 6) {
       adjustedData = _.map(data, (obj) => {
-        yTickerFormat = "mil";
+        yTickerFormat = "MM";
         return {
           ...obj,
           adjCollateralAmount:
-            Math.floor((obj.collateralAmount / 10 ** 3) * 100) / 100,
+            Math.floor((obj.collateralAmount / 10 ** 6) * 100) / 100,
         };
       });
     } else {
