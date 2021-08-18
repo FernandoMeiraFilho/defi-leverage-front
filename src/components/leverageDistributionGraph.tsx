@@ -48,7 +48,10 @@ const LeverageDistributionGraph: FC<GraphProps> = ({
   if (!loading) {
     //initial raw data loading
     for (let collateral of data.collateral) {
-      if (collateral.collateralAmount > 0.0001) {
+      if (
+        collateral.collateralAmount > 0.0001 &&
+        collateral.liquidationPrice > 0
+      ) {
         graphData.push({
           ...collateral,
           liquidationPrice:
@@ -86,6 +89,8 @@ const LeverageDistributionGraph: FC<GraphProps> = ({
     finalYticker = yTickerHandle === "k" ? "thousand" : "million";
   }
 
+  console.log(finalData);
+
   return (
     <div className="box">
       <h1>Teste</h1>
@@ -104,6 +109,10 @@ const LeverageDistributionGraph: FC<GraphProps> = ({
             name="Liquidation Price"
             dataKey="liquidationPrice"
             tickFormatter={tickFormatter}
+            label={{
+              value: `Liquidation Price`,
+              position: "bottom",
+            }}
           />
           <YAxis
             label={{
@@ -115,7 +124,7 @@ const LeverageDistributionGraph: FC<GraphProps> = ({
             tickFormatter={tickFormatter}
           />
           <Tooltip />
-          <Legend />
+          <Legend align="right" />
           <Bar dataKey="adjCollateralAmount" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>

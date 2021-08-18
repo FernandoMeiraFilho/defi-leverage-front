@@ -9,6 +9,7 @@ type dataProps = {
 
 const tickerUnitHandler = (data: dataProps[]) => {
   const highestXTicker = _.last(data);
+  const lowestXTicker = data[0];
   const highestYTicker = _.last(_.orderBy(data, ["collateralAmount"], ["asc"]));
 
   if (highestXTicker === undefined || highestYTicker === undefined) {
@@ -60,9 +61,30 @@ const tickerUnitHandler = (data: dataProps[]) => {
     //fixing the X axis
 
     //check how many different prices are
-    //check the max price number of non-decimal digitis
-    //if too big create intervals, if not, use the prices as is
-    // for interval graphs create objet to handle custom tooltips with the highest value holders inside the interval
+    const maxXtickers = 15; //seems like a good number on desktop for display purposes
+
+    if (adjustedData.length <= maxXtickers) {
+      adjustedData = _.map(data, (obj) => {
+        return {
+          ...obj,
+          adjCollateralAmount: obj.collateralAmount,
+          aggLiquidationPrice: obj.liquidationPrice,
+        };
+      });
+    } else {
+      const topTicker = highestXTicker.liquidationPrice;
+      const lowestTicker = lowestXTicker.liquidationPrice;
+      const topBottomDiff = topTicker - lowestTicker;
+      const incrementAggregator = topBottomDiff / maxXtickers;
+
+      const thresholdArray = [];
+      let incrementMemory = lowestTicker;
+      for (let i = 0; i < maxXtickers; i++) {
+        thresholdArray.push((incrementMemory += incrementAggregator));
+      }
+      console.log(`minTicker: ${lowestTicker}, maxTicker: ${topTicker}`);
+      console.log("threshold array", thresholdArray);
+    }
 
     return { adjustedData, yTickerFormat };
   }
