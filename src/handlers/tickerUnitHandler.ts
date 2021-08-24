@@ -18,9 +18,9 @@ const tickerUnitHandler = (data: dataProps[]) => {
       err1: "",
     };
   } else {
-    const maxXTickerDigits = highestXTicker.liquidationPrice
-      .toString()
-      .split(".")[0].length;
+    // const maxXTickerDigits = highestXTicker.liquidationPrice
+    //   .toString()
+    //   .split(".")[0].length;
 
     const maxYTickerDigits = highestYTicker.collateralAmount
       .toString()
@@ -113,10 +113,32 @@ const tickerUnitHandler = (data: dataProps[]) => {
             }
           }
         }
+
+        // if there are no data on this group we should use the threshold as the max..
+        lastThresholdPrice =
+          lastThresholdPrice === 0 ? threshold : lastThresholdPrice;
+
+        // formatting the xTickers when they are big
+        const lowerBoundDigits = liquidationPriceLow
+          .toString()
+          .split(".")[0].length;
+        const upperBoundDigits = lastThresholdPrice
+          .toString()
+          .split(".")[0].length;
+
+        let liquidationPriceString;
+        if (lowerBoundDigits > 3 || upperBoundDigits > 3) {
+          liquidationPriceString = `${Math.floor(
+            Math.floor(liquidationPriceLow / 10) / 100
+          )}k to ${Math.floor(Math.floor(lastThresholdPrice / 10) / 100)}k`;
+        } else {
+          liquidationPriceString = `${
+            Math.floor(Math.floor(liquidationPriceLow * 100) / 10) / 10
+          } to ${Math.floor(lastThresholdPrice * 10) / 10}`;
+        }
+        // FINAL OBJECT
         formedData.push({
-          liquidationPrice: `${
-            Math.floor(liquidationPriceLow * 100) / 100
-          } to ${lastThresholdPrice}`,
+          liquidationPrice: liquidationPriceString,
           adjCollateralAmount: totalCollateralAmount,
           detailedAmounts: tickerDetailed,
           token_erc_code: data[0].token_erc_code,

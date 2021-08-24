@@ -1,5 +1,5 @@
 import React, { FC, ReactElement } from "react";
-import _ from "lodash";
+import _, { transform } from "lodash";
 import { gql, useQuery } from "@apollo/client";
 import {
   Bar,
@@ -11,7 +11,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
 import tickerHandler from "../handlers/tickerUnitHandler";
 
 type GraphProps = {
