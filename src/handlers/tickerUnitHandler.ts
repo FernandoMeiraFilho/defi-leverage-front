@@ -25,7 +25,6 @@ const tickerUnitHandler = (data: dataProps[]) => {
     const maxYTickerDigits = highestYTicker.collateralAmount
       .toString()
       .split(".")[0].length;
-    console.log(maxYTickerDigits);
 
     let yTickerFormat = "";
 
@@ -61,14 +60,12 @@ const tickerUnitHandler = (data: dataProps[]) => {
     //fixing the X axis
 
     //check how many different prices are
-    const maxXtickers = 15; //seems like a good number on desktop for display purposes
-
+    const maxXtickers = 12; //seems like a good number on desktop for display purposes
+    let finalData;
     if (adjustedData.length <= maxXtickers) {
-      adjustedData = _.map(data, (obj) => {
+      finalData = _.map(adjustedData, (obj) => {
         return {
           ...obj,
-          adjCollateralAmount: obj.collateralAmount,
-          aggLiquidationPrice: obj.liquidationPrice,
         };
       });
     } else {
@@ -77,16 +74,60 @@ const tickerUnitHandler = (data: dataProps[]) => {
       const topBottomDiff = topTicker - lowestTicker;
       const incrementAggregator = topBottomDiff / maxXtickers;
 
+      // creating a array with the thresholds to aggregate price
       const thresholdArray = [];
       let incrementMemory = lowestTicker;
       for (let i = 0; i < maxXtickers; i++) {
         thresholdArray.push((incrementMemory += incrementAggregator));
       }
-      console.log(`minTicker: ${lowestTicker}, maxTicker: ${topTicker}`);
-      console.log("threshold array", thresholdArray);
+
+      // aggregating the prices
+
+      let liquidationPriceLow = lowestTicker;
+      const formedData = [];
+      let soma = 0;
+      let index = 0;
+      for (let threshold of thresholdArray) {
+        index += 1;
+        const tickerDetailed = [];
+        let totalCollateralAmount = 0;
+        let lastThresholdPrice = 0;
+
+        for (let blob of adjustedData) {
+          if (index === maxXtickers) {
+            if (blob.liquidationPrice > liquidationPriceLow) {
+              totalCollateralAmount += blob.adjCollateralAmount;
+              tickerDetailed.push(blob);
+              lastThresholdPrice = blob.liquidationPrice;
+              soma += blob.adjCollateralAmount;
+            }
+          } else {
+            if (
+              blob.liquidationPrice > liquidationPriceLow &&
+              blob.liquidationPrice <= threshold
+            ) {
+              totalCollateralAmount += blob.adjCollateralAmount;
+              tickerDetailed.push(blob);
+              lastThresholdPrice = blob.liquidationPrice;
+              soma += blob.adjCollateralAmount;
+            }
+          }
+        }
+        formedData.push({
+          liquidationPrice: `${
+            Math.floor(liquidationPriceLow * 100) / 100
+          } to ${lastThresholdPrice}`,
+          adjCollateralAmount: totalCollateralAmount,
+          detailedAmounts: tickerDetailed,
+          token_erc_code: data[0].token_erc_code,
+          protocol_name: data[0].protocol_name,
+        });
+        liquidationPriceLow = threshold;
+        finalData = formedData;
+      }
     }
 
-    return { adjustedData, yTickerFormat };
+    return { finalData, yTickerFormat };
   }
 };
 

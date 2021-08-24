@@ -72,8 +72,8 @@ const LeverageDistributionGraph: FC<GraphProps> = ({
     graphData = _.orderBy(graphData, ["liquidationPrice"], ["asc"]);
 
     //formating and organizing the final data to be rendered on the graph
-    const { adjustedData, yTickerFormat } = tickerHandler(graphData);
-    cleanData = adjustedData;
+    const { finalData, yTickerFormat } = tickerHandler(graphData);
+    cleanData = finalData;
     yTickerHandle = yTickerFormat;
   }
 
