@@ -1,5 +1,5 @@
 import React, { FC, ReactElement } from "react";
-import _, { transform } from "lodash";
+import _ from "lodash";
 import { gql, useQuery } from "@apollo/client";
 import {
   Bar,
