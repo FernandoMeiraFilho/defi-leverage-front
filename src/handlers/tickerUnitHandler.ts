@@ -127,10 +127,17 @@ const tickerUnitHandler = (data: dataProps[]) => {
           .split(".")[0].length;
 
         let liquidationPriceString;
+        console.log(topTicker);
         if (lowerBoundDigits > 3 || upperBoundDigits > 3) {
-          liquidationPriceString = `${Math.floor(
-            Math.floor(liquidationPriceLow / 10) / 100
-          )}k to ${Math.floor(Math.floor(lastThresholdPrice / 10) / 100)}k`;
+          if (topTicker.toString().split(".")[0].length <= 4) {
+            liquidationPriceString = `${
+              Math.floor(liquidationPriceLow / 100) / 10
+            }k to ${Math.floor(lastThresholdPrice / 100) / 10}k`;
+          } else {
+            liquidationPriceString = `${Math.floor(
+              Math.floor(liquidationPriceLow / 10) / 100
+            )}k to ${Math.floor(Math.floor(lastThresholdPrice / 10) / 100)}k`;
+          }
         } else {
           liquidationPriceString = `${
             Math.floor(Math.floor(liquidationPriceLow * 100) / 10) / 10
