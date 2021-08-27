@@ -1,5 +1,6 @@
 import * as _ from "lodash";
 import { dataProps } from "../tickerUnitHandler";
+import { dataPropsAdjusted } from "./xAxisHelper";
 
 const xAxisAggregator = (
   maxXtickers: number,
@@ -7,7 +8,7 @@ const xAxisAggregator = (
   data: any,
   highestXTicker: dataProps,
   lowestXTicker: dataProps
-) => {
+): dataPropsAdjusted[] | undefined => {
   const topTicker = highestXTicker.liquidationPrice;
   const lowestTicker = lowestXTicker.liquidationPrice;
   const topBottomDiff = topTicker - lowestTicker;
@@ -29,7 +30,7 @@ const xAxisAggregator = (
   let index = 0;
   for (let threshold of thresholdArray) {
     index += 1;
-    const tickerDetailed = [];
+    const tickerDetailed: dataProps[] = [];
     let totalCollateralAmount = 0;
     let lastThresholdPrice = 0;
 
@@ -64,7 +65,7 @@ const xAxisAggregator = (
       .split(".")[0].length;
     const upperBoundDigits = lastThresholdPrice.toString().split(".")[0].length;
 
-    let liquidationPriceString;
+    let liquidationPriceString: string;
 
     if (lowerBoundDigits > 3 || upperBoundDigits > 3) {
       if (topTicker.toString().split(".")[0].length <= 4) {
@@ -82,17 +83,18 @@ const xAxisAggregator = (
       } to ${Math.floor(lastThresholdPrice * 10) / 10}`;
     }
     // FINAL OBJECT
-    formedData.push({
+    const newObj: dataPropsAdjusted = {
       liquidationPrice: liquidationPriceString,
       adjCollateralAmount: totalCollateralAmount,
       detailedAmounts: tickerDetailed,
       token_erc_code: data[0].token_erc_code,
       protocol_name: data[0].protocol_name,
-    });
+    };
+    formedData.push(newObj);
     liquidationPriceLow = threshold;
     cleanedData = formedData;
   }
-  return { cleanedData };
+  return cleanedData;
 };
 
 export default xAxisAggregator;
